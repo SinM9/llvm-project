@@ -28,10 +28,6 @@ struct Practice : public FunctionPass {
                 continue;
             }
 
-            if (!instruction->use_empty()) {
-                replaceWithArgument(instruction);
-            }
-
             instruction->eraseFromParent();
             changed = true;
 
@@ -59,11 +55,6 @@ private:
         return constant && constant->isZero();
     }
 
-    void replaceWithArgument(Instruction* instruction) const {
-        auto const& lhs = instruction->getOperand(0);
-        auto const& rhs = instruction->getOperand(1);
-        instruction->replaceAllUsesWith(isZero(lhs) ? rhs : lhs);
-    }
 };
 
 }
