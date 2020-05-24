@@ -1,0 +1,12 @@
+Commands:
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/clang++ -O0 -emit-llvm -S -c main.cpp -o /dev/stdout | sed 's/ optnone//g' > main.ll
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/clang++ main.ll -o main.native
+    time ./main.native
+
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/opt -load /home/marusya/compiler-course/llvm-project/llvm/build/lib/LLVMPractice.so -practice < main.ll -S -o optim.ll
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/clang++ optim.ll -o optim.native
+    time ./optim.native
+
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/opt --sroa < optim.ll -S -o sroa.ll
+    /home/marusya/compiler-course/llvm-project/llvm/build/bin/clang++ sroa.ll -o sroa.native
+    time ./sroa.native
