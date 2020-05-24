@@ -17,7 +17,7 @@ struct Practice : public FunctionPass {
 
     bool runOnFunction(Function& function) override {
         errs() << "********** PRACTICE PEEPHOLE OPTIMIZER **********\n";
-        errs() << "********** Function: " << function.getName() << '\n';
+        errs() << "********** Function123: " << function.getName() << '\n';
 
         bool changed = false;
         for (inst_iterator ii = inst_begin(function), ie = inst_end(function); ii != ie;) {
@@ -27,10 +27,13 @@ struct Practice : public FunctionPass {
             if (!isTrivialSub(instruction)) {
                 continue;
             }
-
+            
+            if (!instruction->use_empty()) {
+                replaceWithArgument(instruction);
+            }
+            
             instruction->eraseFromParent();
             changed = true;
-
         }
 
         return changed;
@@ -46,15 +49,18 @@ private:
     }
 
     bool isTrivial(Instruction const* instruction) const {
-        auto const& operands = instruction->operands();
-        return std::any_of(operands.begin(), operands.end(), [this](auto const& operand) { return isZero(operand); });
+        auto const& rhs = instruction->getOperand(1);
+        return isZero(rhs);
     }
 
     bool isZero(Value const* operand) const {
         auto const constant = dyn_cast<ConstantInt>(operand);
         return constant && constant->isZero();
     }
-
+    void replaceWithArgument(Instruction* instruction) const {
+        auto const& lhs = instruction->getOperand(0);
+        instruction->replaceAllUsesWith(lhs);
+    }
 };
 
 }
